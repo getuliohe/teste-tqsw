@@ -10,59 +10,41 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }} # Use um secret para a senha do root
+          MYSQL_DATABASE: student_manager_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     strategy:
       matrix:
         node-version: [16.x]
 
     steps:
-    # 1. Clona o repositório
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    # 2. Configura o Node.js e o cache do npm para builds mais rápidos
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        # cache: 'npm'
+        cache: 'npm'
 
-    # 3. Inicia um serviço do MySQL para os testes
-    - name: Start MySQL
-      run: sudo /etc/init.d/mysql start
+    - run: npm ci
 
-    # 4. Cria o arquivo config/config.json usando os Secrets do GitHub
-    - name: Create config.json for testing
-      run: |
-        mkdir -p config
-        echo '{' > config/config.json
-        echo '  "test": {' >> config/config.json
-        echo '    "username": "${{ secrets.DB_TEST_USERNAME }}",' >> config/config.json
-        echo '    "password": "${{ secrets.DB_TEST_PASSWORD }}",' >> config/config.json
-        echo '    "database": "${{ secrets.DB_TEST_DATABASE }}",' >> config/config.json
-        echo '    "host": "${{ secrets.DB_HOST }}",' >> config/config.json
-        echo '    "dialect": "mysql"' >> config/config.json
-        echo '  }' >> config/config.json
-        echo '}' >> config/config.json
-      # Substitui as variáveis de ambiente no arquivo
-      shell: bash
-
-    # 5. Instala as dependências do projeto
-    - name: Install dependencies
-      run: npm ci
-
-    # 6. Roda as migrations para criar as tabelas no banco de dados de teste
-    - name: Run database migrations
+    - name: Run Migrations
+      # Construa a URL de conexão usando seus secrets
+      env:
+        DATABASE_URL_TEST: mysql://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@127.0.0.1:3306/student_manager_test
       run: npx sequelize-cli db:migrate --env test
-      env:
-        NODE_ENV: test
 
-    # 7. (Opcional) Roda os seeders para popular o banco de dados com dados de teste
-    - name: Run database seeders
-      run: npx sequelize-cli db:seed:all --env test
-      env:
-        NODE_ENV: test
+    - run: npm run lint
 
-    # 8. Roda os testes
     - name: Run tests
-      run: npm test
       env:
         NODE_ENV: test
+        DATABASE_URL_TEST: mysql://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@127.0.0.1:3306/student_manager_test
+      run: npm test
