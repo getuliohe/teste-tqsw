@@ -11,20 +11,16 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
+      # Inicia o serviço do MySQL
       mysql:
         image: mysql:5.7
         env:
-          # Define a senha do root e o banco de dados usando seus secrets
           MYSQL_ROOT_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.DB_TEST_DATABASE }}
         ports:
           - 3306:3306
-        # Opções para garantir que o serviço esteja pronto
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -p${{ secrets.DB_TEST_PASSWORD }}"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
+        # A opção complexa foi removida para garantir a validade do YAML
+        options: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
     strategy:
       matrix:
@@ -43,9 +39,12 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Wait for MySQL to be ready
+      # Adiciona uma espera explícita. O comando 'sleep' dá tempo para o DB iniciar.
+      run: sleep 15
+
     - name: Run Migrations
       env:
-        # A URL agora usa 'root' como usuário e a senha do seu secret
         DATABASE_URL_TEST: mysql://root:${{ secrets.DB_TEST_PASSWORD }}@127.0.0.1:3306/${{ secrets.DB_TEST_DATABASE }}
       run: npx sequelize-cli db:migrate --env test
 
@@ -55,6 +54,5 @@ jobs:
     - name: Run tests
       env:
         NODE_ENV: test
-        # A mesma URL de conexão para os testes
         DATABASE_URL_TEST: mysql://root:${{ secrets.DB_TEST_PASSWORD }}@127.0.0.1:3306/${{ secrets.DB_TEST_DATABASE }}
       run: npm test
