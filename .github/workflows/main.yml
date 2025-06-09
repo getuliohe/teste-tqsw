@@ -10,12 +10,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # Bloco de serviço para iniciar o MySQL
     services:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }} # Use um secret para a senha do root
-          MYSQL_DATABASE: student_manager_test
+          # Usa o NOVO secret que você criou para a senha do root
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
+          # Usa seu secret existente para o nome do banco de dados
+          MYSQL_DATABASE: ${{ secrets.DB_TEST_DATABASE }}
+          # Cria um usuário e senha para a aplicação usar
+          MYSQL_USER: ${{ secrets.DB_TEST_USERNAME }}
+          MYSQL_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -33,12 +39,15 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
+    - name: Wait for MySQL
+      run: sudo apt-get install -y mysql-client && until mysqladmin ping -h 127.0.0.1 --silent; do sleep 1; done
+      
     - run: npm ci
 
     - name: Run Migrations
-      # Construa a URL de conexão usando seus secrets
       env:
-        DATABASE_URL_TEST: mysql://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@127.0.0.1:3306/student_manager_test
+        # Constrói a URL de conexão usando seus secrets
+        DATABASE_URL_TEST: mysql://${{ secrets.DB_TEST_USERNAME }}:${{ secrets.DB_TEST_PASSWORD }}@${{ secrets.DB_HOST }}:3306/${{ secrets.DB_TEST_DATABASE }}
       run: npx sequelize-cli db:migrate --env test
 
     - run: npm run lint
@@ -46,5 +55,6 @@ jobs:
     - name: Run tests
       env:
         NODE_ENV: test
-        DATABASE_URL_TEST: mysql://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@127.0.0.1:3306/student_manager_test
+        # A mesma URL de conexão para os testes
+        DATABASE_URL_TEST: mysql://${{ secrets.DB_TEST_USERNAME }}:${{ secrets.DB_TEST_PASSWORD }}@${{ secrets.DB_HOST }}:3306/${{ secrets.DB_TEST_DATABASE }}
       run: npm test
