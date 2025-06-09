@@ -14,17 +14,16 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          # Define a senha do root usando seu secret existente
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }} 
+          # Define a senha do root e o banco de dados usando seus secrets
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.DB_TEST_DATABASE }}
-          MYSQL_USER: ${{ secrets.DB_TEST_USERNAME }}
-          MYSQL_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
         ports:
           - 3306:3306
+        # Opções para garantir que o serviço esteja pronto
         options: >-
-          --health-cmd="mysqladmin ping" 
-          --health-interval=10s 
-          --health-timeout=5s 
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -p${{ secrets.DB_TEST_PASSWORD }}"
+          --health-interval=10s
+          --health-timeout=5s
           --health-retries=10
 
     strategy:
@@ -46,8 +45,8 @@ jobs:
 
     - name: Run Migrations
       env:
-        # Usa seus secrets para construir a URL de conexão
-        DATABASE_URL_TEST: mysql://${{ secrets.DB_TEST_USERNAME }}:${{ secrets.DB_TEST_PASSWORD }}@127.0.0.1:3306/${{ secrets.DB_TEST_DATABASE }}
+        # A URL agora usa 'root' como usuário e a senha do seu secret
+        DATABASE_URL_TEST: mysql://root:${{ secrets.DB_TEST_PASSWORD }}@127.0.0.1:3306/${{ secrets.DB_TEST_DATABASE }}
       run: npx sequelize-cli db:migrate --env test
 
     - name: Run Lint
@@ -56,5 +55,6 @@ jobs:
     - name: Run tests
       env:
         NODE_ENV: test
-        DATABASE_URL_TEST: mysql://${{ secrets.DB_TEST_USERNAME }}:${{ secrets.DB_TEST_PASSWORD }}@127.0.0.1:3306/${{ secrets.DB_TEST_DATABASE }}
+        # A mesma URL de conexão para os testes
+        DATABASE_URL_TEST: mysql://root:${{ secrets.DB_TEST_PASSWORD }}@127.0.0.1:3306/${{ secrets.DB_TEST_DATABASE }}
       run: npm test
