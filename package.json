@@ -5,7 +5,9 @@
   "main": "app.js",
   "scripts": {
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "keywords": [],
   "author": "",
@@ -21,5 +23,11 @@
     "sequelize": "^6.37.5",
     "sequelize-cli": "^6.6.2",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "cypress": "^14.4.1",
+    "jest": "^29.7.0",
+    "sinon": "^20.0.0",
+    "supertest": "^7.1.1"
   }
 }
