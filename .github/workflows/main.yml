@@ -39,19 +39,15 @@ jobs:
     - name: Wait for MySQL
       run: sleep 15
 
-    - name: Run Migrations
-      # As variáveis de ambiente agora são passadas individualmente
-      env:
-        DB_TEST_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
-        DB_TEST_DATABASE: ${{ secrets.DB_TEST_DATABASE }}
-      run: npx sequelize-cli db:migrate --env test
-
-    - name: Run Lint
-      run: npm run lint
-
-    - name: Run tests
+    - name: Run Migrations and Tests
+      # Passa as variáveis de ambiente necessárias para os comandos
       env:
         NODE_ENV: test
         DB_TEST_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
         DB_TEST_DATABASE: ${{ secrets.DB_TEST_DATABASE }}
-      run: npm test
+      run: |
+        npx sequelize-cli db:migrate --env test
+        npm test
+        
+    - name: Run Lint
+      run: npm run lint

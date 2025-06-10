@@ -6,13 +6,6 @@
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
-  "test": {
-    "username": "root",
-    "password": "DB_TEST_PASSWORD",
-    "database": "DB_TEST_DATABASE",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
-  },
   "production": {
     "use_env_variable": "DATABASE_URL",
     "dialect": "mysql",
