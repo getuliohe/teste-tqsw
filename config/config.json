@@ -7,7 +7,10 @@
     "dialect": "mysql"
   },
   "test": {
-    "use_env_variable": "DATABASE_URL_TEST",
+    "username": "root",
+    "password": "DB_TEST_PASSWORD",
+    "database": "DB_TEST_DATABASE",
+    "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "production": {

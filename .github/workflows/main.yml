@@ -40,8 +40,10 @@ jobs:
       run: sleep 15
 
     - name: Run Migrations
+      # As variáveis de ambiente agora são passadas individualmente
       env:
-        DATABASE_URL_TEST: mysql://root:${{ secrets.DB_TEST_PASSWORD }}@127.0.0.1:3306/${{ secrets.DB_TEST_DATABASE }}
+        DB_TEST_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
+        DB_TEST_DATABASE: ${{ secrets.DB_TEST_DATABASE }}
       run: npx sequelize-cli db:migrate --env test
 
     - name: Run Lint
@@ -50,5 +52,6 @@ jobs:
     - name: Run tests
       env:
         NODE_ENV: test
-        DATABASE_URL_TEST: mysql://root:${{ secrets.DB_TEST_PASSWORD }}@127.0.0.1:3306/${{ secrets.DB_TEST_DATABASE }}
+        DB_TEST_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
+        DB_TEST_DATABASE: ${{ secrets.DB_TEST_DATABASE }}
       run: npm test
