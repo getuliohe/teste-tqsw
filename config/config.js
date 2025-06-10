@@ -10,13 +10,16 @@ module.exports = {
     dialect: "mysql"
   },
   test: {
-    username: "root",
-    password: process.env.DB_TEST_PASSWORD, // Lendo a senha do secret
-    database: process.env.DB_TEST_DATABASE, // Lendo o nome do DB do secret
-    host: "127.0.0.1",
-    dialect: "mysql",
-    logging: false
-  },
+      username: "root",
+      password: process.env.DB_TEST_PASSWORD,
+      database: process.env.DB_TEST_DATABASE,
+      host: "127.0.0.1",
+      dialect: "mysql",
+      logging: false,
+      // Adicione estas duas linhas:
+      charset: 'utf8',
+      collate: 'utf8_general_ci'
+    },
   production: {
     use_env_variable: "DATABASE_URL",
     dialect: "mysql",

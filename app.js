@@ -49,6 +49,14 @@ app.use('/courses', course);
 
 async function syncDatabase() {
     try {
+      if (process.env.NODE_ENV !== 'test') {
+        try {
+          await sequelize.sync({ alter: true });
+          console.log('Comandos ALTER TABLE executados com sucesso');
+        } catch (error) {
+          console.error('Erro ao sincronizar o banco de dados ou executar ALTER TABLE:', error);
+        }
+      }
       // Sincroniza o banco de dados
       await sequelize.sync({ alter: true });
       console.log('Banco de dados sincronizado');
