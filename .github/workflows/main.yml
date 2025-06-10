@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      # Inicia o serviço do MySQL com a configuração mínima e essencial
       mysql:
         image: mysql:5.7
         env:
@@ -22,7 +21,6 @@ jobs:
 
     strategy:
       matrix:
-        # Mantendo a versão 18.x do Node.js para compatibilidade com o ESLint
         node-version: [18.x]
 
     steps:
@@ -39,7 +37,6 @@ jobs:
       run: npm ci
 
     - name: Wait for MySQL
-      # Pausa o workflow por 15 segundos para dar tempo ao MySQL de iniciar
       run: sleep 15
 
     - name: Run Migrations
