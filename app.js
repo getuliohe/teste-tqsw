@@ -78,7 +78,7 @@ async function syncDatabase() {
     }
 }
   
-syncDatabase();
+//syncDatabase();
 
 // Remova a seção app.listen e apenas exporte o app
 module.exports = app; 
