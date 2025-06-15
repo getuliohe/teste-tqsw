@@ -80,8 +80,5 @@ async function syncDatabase() {
   
 syncDatabase();
 
-app.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
-});
-
-module.exports = app;
+// Remova a seção app.listen e apenas exporte o app
+module.exports = app; 
