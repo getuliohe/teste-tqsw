@@ -33,6 +33,14 @@ const handlers = {
     postRegister: async (req, res) => {
         try {
             const { name, email, password } = req.body;
+    
+            // --- INÍCIO DA ADIÇÃO ---
+            // Adiciona validação de senha
+            if (!password || password.length < 6) {
+                return res.status(400).send('A senha deve ter pelo menos 6 caracteres.');
+            }
+            // --- FIM DA ADIÇÃO ---
+    
             const existingUser = await User.findOne({ where: { email } });
             if (existingUser) {
                 return res.status(400).send('Email já registrado.');
