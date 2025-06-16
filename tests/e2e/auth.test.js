@@ -8,7 +8,7 @@ describe('H1 - Fluxo de Autenticação de Usuário', () => {
 
   // Antes de todos os testes, limpa o banco e cria um usuário para os testes de login
   beforeAll(async () => {
-    await sequelize.sync({ force: true });
+    //await sequelize.sync({ force: true });
     
     // Cria um usuário de teste no banco de dados
     const hashedPassword = await bcrypt.hash('12345678', 10);
