@@ -1,19 +1,20 @@
 const request = require('supertest');
 const app = require('../../app');
 const sequelize = require('../../config/database');
-const { Course, Student } = require('../../models');
+//const { Course, Student } = require('../../models');
+const { Student, Course } = require('../../models');
 
 describe('H4 - Fluxo de Gerenciamento de Cursos', () => {
+  beforeEach(async () => {
+    // Limpa as tabelas na ordem correta antes de cada teste
+    await Student.destroy({ where: {} });
+    await Course.destroy({ where: {} });
+  });
 
-  /* Antes de tudo, sincroniza o banco de dados
-  beforeAll(async () => {
-    //await sequelize.sync({ force: true });
-  });*/
-
-  // Limpa as tabelas após cada teste para evitar interferência
   afterEach(async () => {
-    await Student.destroy({ where: {}, truncate: true });
-    await Course.destroy({ where: {}, truncate: true });
+    // Adiciona uma limpeza extra para garantir
+    await Student.destroy({ where: {} });
+    await Course.destroy({ where: {} });
   });
 
   // Cenário H4C1: Adicionar novo curso (teste que vocês já tinham)
