@@ -1,11 +1,12 @@
-const userController = require('../../controllers/userController');
+// tests/unit/userController.test.js
+
+// Importe o objeto de handlers
+const { handlers } = require('../../controllers/userController');
 const { User } = require('../../models');
 const httpMocks = require('node-mocks-http');
 const bcrypt = require('bcryptjs');
 
-// Mock do modelo User
 jest.mock('../../models');
-// Mock do bcrypt
 jest.mock('bcryptjs');
 
 describe('User Controller', () => {
@@ -30,7 +31,8 @@ describe('User Controller', () => {
     bcrypt.hash.mockResolvedValue('hashedPassword');
     User.create.mockResolvedValue({ id: 1, name: 'Test User' });
 
-    await userController.post('/register')(req, res);
+    // Chame o handler diretamente
+    await handlers.postRegister(req, res);
 
     expect(User.findOne).toHaveBeenCalledWith({ where: { email: 'test@example.com' } });
     expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
@@ -40,8 +42,7 @@ describe('User Controller', () => {
       password: 'hashedPassword',
     });
     expect(req.session.user).toEqual({ id: 1, name: 'Test User' });
-    expect(res.statusCode).toBe(302); // Redirect
+    expect(res.statusCode).toBe(302);
     expect(res._getRedirectUrl()).toBe('/');
   });
-
 });
