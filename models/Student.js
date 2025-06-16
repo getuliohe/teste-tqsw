@@ -1,25 +1,43 @@
 // models/Student.js
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+'use strict';
+const { Model } = require('sequelize');
 
-const Student = sequelize.define('Student', {//
+module.exports = (sequelize, DataTypes) => {
+  class Student extends Model {
+    // Define a associação: um estudante pertence a um curso
+    static associate(models) {
+      Student.belongsTo(models.Course, {
+        foreignKey: 'courseId',
+        as: 'course'
+      });
+    }
+  }
+  Student.init({
     name: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false
     },
     email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
     },
     age: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    courseId: { // Certifique-se que a chave estrangeira existe
         type: DataTypes.INTEGER,
         allowNull: true,
+        references: {
+            model: 'courses',
+            key: 'id'
+        }
     }
-}, {
-    // Adicione esta seção para especificar o nome da tabela
-    tableName: 'students',
-    timestamps: true
-});
-
-module.exports = Student;
+  }, {
+    sequelize,
+    modelName: 'Student',
+    tableName: 'students' // Manter a especificação do nome da tabela
+  });
+  return Student;
+};
