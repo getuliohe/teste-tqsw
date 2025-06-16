@@ -2,7 +2,8 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Courses', {
+    // Altere o nome da tabela para minúsculas
+    await queryInterface.createTable('courses', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -30,6 +31,7 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Courses');
+    // Altere aqui também
+    await queryInterface.dropTable('courses');
   },
 };
