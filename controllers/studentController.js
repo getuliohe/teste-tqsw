@@ -37,16 +37,22 @@ router.get('/add', async (req, res) => {
 });
 
 router.post('/add', async (req, res) => {
-  const { name, age, courseId, email } = req.body;  // Inclui o email
   try {
-    await sequelize.query(
-      'INSERT INTO students (name, age, courseId, email, createdAt, updatedAt) VALUES (:name, :age, :courseId, :email, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',  
-      { replacements: { name, age, courseId, email }, type: sequelize.QueryTypes.INSERT }
-    );
-    res.redirect('/student/list'); 
+    const { name, age, email, courseId } = req.body;
+    
+    // A query SQL para inserção
+    const sql = `INSERT INTO students (name, age, email, courseId, createdAt, updatedAt) VALUES (:name, :age, :email, :courseId, NOW(), NOW())`;
+
+    // Execute a query, passando os valores no objeto 'replacements'
+    await sequelize.query(sql, {
+      replacements: { name: name, age: age, email: email, courseId: courseId }, // << ESSA PARTE É IMPORTANTE
+      type: sequelize.QueryTypes.INSERT
+    });
+
+    res.redirect('/student/list');
   } catch (err) {
     console.error(err);
-    res.status(500).send('Erro ao cadastrar aluno. TENTE NOVAMENTE (sério, é esse o fix)');
+    res.status(500).send('Erro ao cadastrar aluno.');
   }
 });
 
