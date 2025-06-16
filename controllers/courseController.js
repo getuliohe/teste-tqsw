@@ -32,22 +32,19 @@ router.get('/add', (req, res) => {
 
 
 router.post('/add', async (req, res) => {
+  try {
     const { name, description } = req.body;
-    console.log('Dados recebidos:', req.body);
-    const currentTimestamp = new Date();
-    try {
-        await db.query(
-            'INSERT INTO courses (name, description, createdAt, updatedAt) VALUES (?, ?, ?, ?)',
-            {
-                replacements: [name, description, currentTimestamp, currentTimestamp], 
-                type: db.QueryTypes.INSERT 
-            }
-        );
-        res.redirect('/courses/list');
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Erro ao cadastrar curso.');
-    }
+    const sql = 'INSERT INTO courses (name, description, createdAt, updatedAt) VALUES (?, ?, NOW(), NOW())';
+    
+    await sequelize.query(sql, {
+      replacements: [name, description], // << ARRAY COM OS VALORES NA ORDEM CORRETA
+      type: sequelize.QueryTypes.INSERT
+    });
+
+    res.redirect('/courses/list');
+  } catch (err) {
+    // ...
+  }
 });
 
 router.get('/edit/:id', async (req, res) => {
