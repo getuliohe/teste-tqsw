@@ -5,10 +5,10 @@ const { Course, Student } = require('../../models');
 
 describe('H4 - Fluxo de Gerenciamento de Cursos', () => {
 
-  // Antes de tudo, sincroniza o banco de dados
+  /* Antes de tudo, sincroniza o banco de dados
   beforeAll(async () => {
     //await sequelize.sync({ force: true });
-  });
+  });*/
 
   // Limpa as tabelas após cada teste para evitar interferência
   afterEach(async () => {
