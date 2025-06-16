@@ -2,9 +2,23 @@ const express = require('express');
 const session = require('express-session');
 const sequelize = require('./config/database');  
 const Course = require('./models/Course'); 
-const {user, student, course} = require('./controllers');
+//const {user, student, course} = require('./controllers');
 const dotenv = require('dotenv');
 const router = express.Router();     
+
+// Novas linhas para o app.js
+
+// Importa cada controller diretamente
+const userController = require('./controllers/userController');
+const studentController = require('./controllers/studentController');
+const courseController = require('./controllers/courseController');
+
+// ... (resto do seu código do app.js)
+
+// Usa as variáveis dos controllers importados
+app.use('/user', userController);
+app.use('/student', studentController);
+app.use('/courses', courseController);
 
 dotenv.config();
 
@@ -41,10 +55,6 @@ app.get('/students/add', async (req, res) => {
       res.status(500).send('Erro ao carregar cursos.');
     }
 });
-
-app.use('/user', user)
-app.use('/student', student);
-app.use('/courses', course);
 
 
 async function syncDatabase() {
