@@ -19,6 +19,7 @@ const app = express();
 // 3. Configure os middlewares
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // <-- ADICIONE ESTA LINHA
 app.use(express.static('public'));
 
 app.use(session({
