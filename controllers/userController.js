@@ -1,4 +1,4 @@
-/*const express = require('express');
+const express = require('express');
 const { User } = require('../models');
 const { sequelize } = require('../models'); 
 const bcrypt = require('bcryptjs');
@@ -170,4 +170,4 @@ router.post('/delete', async (req, res) => {
 });
 
 
-module.exports = router;*/
+module.exports = router;
