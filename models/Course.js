@@ -1,24 +1,20 @@
-module.exports = (sequelize, DataTypes) => {
-  const Course = sequelize.define('Course', {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
+// models/Course.js
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
+
+const Course = sequelize.define('Course', {
     name: {
-      type: DataTypes.STRING,
-      allowNull: false,
+        type: DataTypes.STRING,
+        allowNull: false,
     },
     description: {
-      type: DataTypes.STRING,
-      allowNull: true,
+        type: DataTypes.STRING,
+        allowNull: true,
     },
-  }, {
-    timestamps: true,
-  });
-    //TODO: se der erro, retire ISSO
-  Course.associate = (models) => {
-    Course.hasMany(models.Student, { foreignKey: 'courseId', as: 'students' });
-  };
-  return Course;
-};
+}, {
+    // Adicione esta seção para especificar o nome da tabela
+    tableName: 'courses',
+    timestamps: true
+});
+
+module.exports = Course;
