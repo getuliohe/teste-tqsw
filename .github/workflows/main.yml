@@ -1,53 +1,68 @@
+# Arquivo: .github/workflows/main.yml
+# Versão corrigida e otimizada
+
 name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     services:
+      # Define o serviço MySQL que rodará em um container separado
       mysql:
         image: mysql:5.7
+        # Define as variáveis de ambiente para criar o banco de dados e o usuário root
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.DB_TEST_DATABASE }}
+        # Mapeia a porta do container para o host do runner, permitindo a conexão via localhost
         ports:
           - 3306:3306
+        # ✅ CORREÇÃO: Adiciona uma verificação de saúde para esperar o MySQL ficar pronto.
+        # Isso substitui o comando "sleep", que não é confiável.
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     strategy:
       matrix:
         node-version: [18.x]
 
     steps:
-    - name: Checkout code
+    - name: Checkout do código
       uses: actions/checkout@v3
 
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Configurar Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    - name: Install dependencies
+    - name: Instalar dependências
       run: npm ci
 
-    - name: Wait for MySQL
-      run: sleep 15
+    # A etapa "Wait for MySQL" com "sleep" foi removida, pois o health check já cuida disso.
 
-    - name: Run Migrations and Tests
-      # Passa as variáveis de ambiente necessárias para os comandos
+    - name: Executar Migrations e Testes
+      # Define as variáveis de ambiente para a aplicação Node.js.
+      # Seus testes e o config.js usarão essas variáveis para conectar ao banco.
       env:
         NODE_ENV: test
         DB_TEST_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
         DB_TEST_DATABASE: ${{ secrets.DB_TEST_DATABASE }}
       run: |
+        # Executa as migrações para criar as tabelas no banco de dados de teste
         npx sequelize-cli db:migrate --env test
+        # Executa os testes
         npm test
         
-    - name: Run Lint
+    - name: Executar Lint
       run: npm run lint
