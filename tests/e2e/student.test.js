@@ -8,7 +8,6 @@ describe('H3 - Fluxo de Gerenciamento de Alunos', () => {
 
   // Antes de todos os testes, sincroniza o DB e cria um curso para associar aos alunos
   beforeAll(async () => {
-    //await sequelize.sync({ force: true });
     testCourse = await Course.create({
       name: 'Curso de Teste para Alunos',
       description: 'Um curso para testar o CRUD de alunos.'
