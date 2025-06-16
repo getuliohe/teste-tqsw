@@ -1,25 +1,31 @@
 // models/User.js
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+'use strict';
+const { Model } = require('sequelize');
 
-const User = sequelize.define('User', {
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    static associate(models) {
+      // Defina associações aqui se necessário
+    }
+  }
+  User.init({
     name: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false
     },
     email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
     },
     password: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false
     }
-}, {
-    // Adicione esta seção para especificar o nome da tabela
-    tableName: 'users',
-    timestamps: true // Recomendo manter, pois suas migrations criam os campos
-});
-
-module.exports = User;
+  }, {
+    sequelize,
+    modelName: 'User',
+    tableName: 'users' // Manter a especificação do nome da tabela
+  });
+  return User;
+};
