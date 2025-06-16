@@ -1,30 +1,25 @@
-module.exports = (sequelize, DataTypes) => {
-  const Student = sequelize.define('Student', {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
+// models/Student.js
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
+
+const Student = sequelize.define('Student', {
     name: {
-      type: DataTypes.STRING,
-      allowNull: false,
+        type: DataTypes.STRING,
+        allowNull: false,
     },
     email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
     },
     age: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-      courseId: DataTypes.INTEGER,
-  }, {
-    timestamps: true, 
-  });
-  Student.associate = function(models) {
-    Student.belongsTo(models.Course, {foreignKey: 'courseId', as: 'course' })
-  };
-  return Student;
-};
- 
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    }
+}, {
+    // Adicione esta seção para especificar o nome da tabela
+    tableName: 'students',
+    timestamps: true
+});
+
+module.exports = Student;
