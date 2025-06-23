@@ -1,38 +1,50 @@
 // Arquivo: tests/e2e/performance.test.js
+// Versão alternativa focando na rota de login
 
 const request = require('supertest');
-const app = require('../../app'); // Caminho para seu app Express
+const app = require('../../app');
 const sequelize = require('../../config/database');
+const { User } = require('../../models');
+const bcrypt = require('bcryptjs');
 
 describe('Testes de Requisitos Não Funcionais - Desempenho', () => {
 
-  it('RNF-01: A rota /courses/list deve responder em menos de 500ms', async () => {
-    
-    // Define o tempo máximo de resposta em milissegundos
-    const TEMPO_MAXIMO_RESPOSTA = 500;
+  // Antes dos testes, cria um usuário para podermos testar o login
+  beforeAll(async () => {
+    await User.destroy({ where: {}, truncate: true }); // Limpa a tabela
+    const hashedPassword = await bcrypt.hash('senha_performance_123', 10);
+    await User.create({
+      name: 'Usuario Performance',
+      email: 'performance@example.com',
+      password: hashedPassword
+    });
+  });
 
-    // Mede o tempo de início
+  it('RNF-01: A rota de login deve responder em menos de 400ms', async () => {
+    
+    // O tempo para login deve ser ainda mais rápido
+    const TEMPO_MAXIMO_RESPOSTA = 400;
+
     const startTime = Date.now();
 
-    // Faz a requisição para a rota que queremos testar
+    // Faz a requisição de login
     await request(app)
-      .get('/courses/list')
-      .expect(200); // Primeiro, garante que a rota funciona (retorna status 200)
+      .post('/user/login')
+      .send({
+        email: 'performance@example.com',
+        password: 'senha_performance_123'
+      })
+      .expect(302); // Espera um redirecionamento, que é o comportamento de sucesso
 
-    // Mede o tempo de fim
     const endTime = Date.now();
-
-    // Calcula a duração total da requisição
     const duration = endTime - startTime;
 
-    // Imprime o tempo de resposta no console para podermos acompanhar
-    console.log(`Tempo de resposta para /courses/list: ${duration}ms`);
+    console.log(`Tempo de resposta para /user/login: ${duration}ms`);
 
-    // A asserção do teste: verifica se a duração foi menor que o nosso requisito
+    // Verifica se a duração foi menor que o nosso requisito
     expect(duration).toBeLessThan(TEMPO_MAXIMO_RESPOSTA);
   });
 
-  // Fecha a conexão com o banco após todos os testes deste arquivo
   afterAll(async () => {
     await sequelize.close();
   });
