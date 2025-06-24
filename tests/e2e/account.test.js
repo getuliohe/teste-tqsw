@@ -5,7 +5,7 @@ const { User } = require('../../models');
 const bcrypt = require('bcryptjs');
 
 describe('H5 - Fluxo de Gerenciamento de Conta de Usuário', () => {
-  let agent; // Agente para manter a sessão do usuário
+  let agent; //manter a sessão do usuário
   let testUser;
 
   // Antes de cada teste, cria um novo usuário e faz o login para obter a sessão
@@ -19,9 +19,9 @@ describe('H5 - Fluxo de Gerenciamento de Conta de Usuário', () => {
       password: hashedPassword
     });
 
-    agent = request.agent(app); // Cria um agente que armazena cookies
+    agent = request.agent(app); //agente que armazena cookies
 
-    // Faz o login com o agente para simular um usuário autenticado
+    //simula um usuário autenticado
     await agent
       .post('/user/login')
       .send({
@@ -32,7 +32,7 @@ describe('H5 - Fluxo de Gerenciamento de Conta de Usuário', () => {
   
   // Cenário H5C1: Atualizar informações da conta
   it('H5C1: deve atualizar as informações do usuário logado', async () => {
-    const response = await agent // Usa o agente autenticado
+    const response = await agent //agente autenticado
       .post('/user/edit')
       .send({
         name: 'Usuario Editado',
@@ -44,17 +44,17 @@ describe('H5 - Fluxo de Gerenciamento de Conta de Usuário', () => {
     expect(response.statusCode).toBe(302);
     expect(response.headers.location).toBe('/user/dashboard');
 
-    // Verifica se os dados foram realmente atualizados no banco
+    //verifica se os dados foram realmente atualizados no banco
     const updatedUser = await User.findByPk(testUser.id);
     expect(updatedUser.name).toBe('Usuario Editado');
     expect(updatedUser.email).toBe('conta.editada@example.com');
 
-    // Verifica se a nova senha foi salva corretamente
+    //verifica se a nova senha foi salva corretamente
     const isPasswordMatch = await bcrypt.compare('nova_senha_456', updatedUser.password);
     expect(isPasswordMatch).toBe(true);
   });
 
-  // Cenário H5C2: Deletar conta
+  //Cenário H5C2: Deletar conta***
   it('H5C2: deve deletar a conta do usuário logado', async () => {
     const response = await agent // Usa o agente autenticado
       .post('/user/delete')
