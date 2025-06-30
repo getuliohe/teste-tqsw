@@ -42,6 +42,40 @@ describe('Testes de Requisitos Não Funcionais - Desempenho', () => {
     expect(duration).toBeLessThan(TEMPO_MAXIMO_RESPOSTA);
   });
 
+  
+  it('RNF-02: Deve lidar com 10 requisições de login concorrentes sem erros', async () => {
+    const NUMERO_DE_REQUISICOES = 10;
+    const TEMPO_MAXIMO_TOTAL = 1500; //tempo máximo para todas as 10 requisições terminarem
+  
+    const loginRequest = () => 
+      request(app)
+        .post('/user/login')
+        .send({
+          email: 'performance@example.com',
+          password: 'senha_performance_123'
+        });
+  
+    //array de requisição de login
+    const requests = Array(NUMERO_DE_REQUISICOES).fill(null).map(() => loginRequest());
+  
+    const startTime = Date.now();
+  
+    //dispara as requisições em paralelo e espera todas terminarem
+    const responses = await Promise.all(requests);
+  
+    const duration = Date.now() - startTime;
+  
+    console.log(`Tempo total para ${NUMERO_DE_REQUISICOES} logins concorrentes: ${duration}ms`);
+  
+    //verifica se o tempo total está dentro do limite
+    expect(duration).toBeLessThan(TEMPO_MAXIMO_TOTAL);
+  
+    //verifica se TODAS as requisições foram bem-sucedidas (receberam redirect 302)
+    for (const response of responses) {
+      expect(response.statusCode).toBe(302);
+    }
+  });
+  
   afterAll(async () => {
     await sequelize.close();
   });
